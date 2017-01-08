@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaRecorder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ public class RecorderService extends Service {
         if ((!TextUtils.isEmpty(filename))){
             //当文件名存在，开始录音
 
+            //注意：这个API就是个大坑货，使用时一定要小心，尤其是声音源和路径这两块
             // 1.实例化一个录音机
             mediaRecorder = new MediaRecorder();
             //2.指定录音机的声音源
@@ -45,10 +47,10 @@ public class RecorderService extends Service {
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             //4.设置文件路径
             //若SD卡上的文件夹不存在，必须先创建好文件夹
-            // 然而4.4无法在SD卡中新建文件夹
-            //否则就会报错:open failed: ENOENT (No such file or directory)
-            String dir = getFilesDir().getAbsolutePath() + filename + ".3gp";
-            mediaRecorder.setOutputFile(dir);
+            //然而4.4无法在SD卡中新建文件夹
+            //会报错:open failed: ENOENT (No such file or directory)
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath() + filename + ".3gp";
+            mediaRecorder.setOutputFile(path);
             //5.设置音频的编码
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
             //6.准备开始录音
