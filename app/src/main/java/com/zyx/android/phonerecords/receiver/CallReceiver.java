@@ -1,4 +1,4 @@
-package com.zyx.android.phonerecords;
+package com.zyx.android.phonerecords.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+
+import com.zyx.android.phonerecords.service.RecorderService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,7 +36,7 @@ public class CallReceiver extends BroadcastReceiver {
 
             SharedPreferences.Editor editor = sp.edit();
             editor.putBoolean("isCall", true);
-            String filename = getResultData() + "_D_"+ getCurrentTime();
+            String filename = getResultData() + "_1_"+ getCurrentTime();
             editor.putString("filename", filename);
             editor.commit();
 
@@ -70,7 +72,7 @@ public class CallReceiver extends BroadcastReceiver {
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putBoolean("isCall",false);
                     //此处的filename可以继续优化，比如将incomingname变为姓名
-                    String filename = incomingNumber +"_J_" +getCurrentTime() ;
+                    String filename = incomingNumber +"_0_" +getCurrentTime() ;
                     editor.putString("filename",filename);
                     editor.commit();
 

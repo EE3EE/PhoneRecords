@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CheckRecordsActivity">
+        <activity android:name=".ManageRecordsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -24,7 +24,7 @@
         </activity>
 
         <receiver
-            android:name=".CallReceiver"
+            android:name=".receiver.CallReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter android:priority="1000">
@@ -34,7 +34,7 @@
         </receiver>
 
         <service
-            android:name=".RecorderService"
+            android:name=".service.RecorderService"
             android:enabled="true"
             android:exported="true">
         </service>

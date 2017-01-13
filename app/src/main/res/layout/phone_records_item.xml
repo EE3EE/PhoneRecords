@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_file_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="录音文件名称"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        />
+
+    <TextView
+        android:id="@+id/tv_file_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="录音日期"
+        android:textColor="#88000000"
+        android:textSize="16sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="3dp"
+        android:layout_below="@+id/tv_file_name"
+        />
+
+    <TextView
+        android:id="@+id/tv_file_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="录音类型"
+        android:textColor="#88000000"
+        android:textSize="16sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="3dp"
+        android:layout_below="@+id/tv_file_name"
+        android:layout_toRightOf="@+id/tv_file_date"
+        />
+
+</RelativeLayout>
