@@ -9,6 +9,7 @@ import android.telephony.TelephonyManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -58,7 +59,6 @@ public class CallReceiver extends BroadcastReceiver {
 
             switch (state){
                 case TelephonyManager.CALL_STATE_IDLE://变为空闲时——关闭录音
-                    //此处最好加上判断，如果服务正在运行，则关闭服务
                     stopRecorderService();
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK://接听时-开启录音
@@ -81,7 +81,8 @@ public class CallReceiver extends BroadcastReceiver {
 
 
     /**
-     * 关闭RecorderService服务——开始录音
+     * 关闭RecorderService服务。
+     * 即调用服务中onDestory方法-关闭录音
      */
     private void stopRecorderService() {
         Intent stopintent = new Intent(context,RecorderService.class);
@@ -90,7 +91,8 @@ public class CallReceiver extends BroadcastReceiver {
 
 
     /**
-     * 启动RecorderService服务-停止录音
+     * 启动RecorderService服务。
+     * 即调用服务中onCreate方法-开始录音
      */
     private void startRecorderService() {
         Intent intent = new Intent(context,RecorderService.class);
@@ -99,16 +101,39 @@ public class CallReceiver extends BroadcastReceiver {
 
 
     /**
-     * 获得当前时区的时间。此处需要优化，暂时获取的不是当前时区的时间
+     * 获得当前时区的时间。
      * @return
-     * 返回yyyyMMddHHmmss类型的时间值
+     * 返回yyyyMMddHHmmss类型的时间字符串
      */
     private String getCurrentTime() {
-        //此处获取的时间注意修改
         Date currentTime = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss",Locale.getDefault());
         return formatter.format(currentTime);
     }
+
+
+//    /**
+//     * 查看服务是否正在运行
+//     * @param className 要查询的服务的全类名
+//     * @return
+//     * true为正在运行，false为未运行
+//     */
+//    private boolean isServiceRunning(String className){
+//        boolean result = false;
+//
+//        ActivityManager am = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
+//        List<ActivityManager.RunningServiceInfo> runningServiceInfos = am.getRunningServices(100);
+//        for (ActivityManager.RunningServiceInfo runningServiceInfo :runningServiceInfos) {
+//            String name = runningServiceInfo.service.getClassName();
+//            if (name.equals(className)) {
+//                result = true;
+//            }
+//        }
+//        return result;
+//    }
+
+
+
 
 
 }
