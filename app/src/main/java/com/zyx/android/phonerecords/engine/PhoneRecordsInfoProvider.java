@@ -27,8 +27,11 @@ public class PhoneRecordsInfoProvider {
 
             info.setName(values[0]);
             info.setType(Integer.valueOf(values[1]));
-            String[] date = values[2].split("\\.");
-            info.setDate(date[0]);
+            String date = values[2];
+            String str = String.format("%s年%s月%s日%s:%s:%s",date.substring(0,4),
+                    date.substring(4,6),date.substring(6,8),date.substring(8,10),
+                    date.substring(10,12),date.substring(12,14));
+            info.setDate(str);
 
             infos.add(info);
         }

@@ -24,17 +24,31 @@ public class ManageRecordsActivity extends Activity {
     private ListView iv_phone_records;
     private File dir;
     List<PhoneRecordsInfo> infos;
-    private String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PhoneRecords/";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_records);
-        createSaveRecordsDir();
 
-        infos = PhoneRecordsInfoProvider.getAllPhoneRecordsInfos(dir);
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PhoneRecords/";
+        createSaveRecordsDir(path);
 
         iv_phone_records = (ListView) findViewById(R.id.iv_phone_records);
+
+        fillData();
+
+    }
+
+
+    /**
+     * 向ListView中填充数据
+     */
+    private void fillData() {
+        if (infos == null) {
+            //获取所有的录音信息
+            infos = PhoneRecordsInfoProvider.getAllPhoneRecordsInfos(dir);
+        }
         iv_phone_records.setAdapter(new MyAdapter());
     }
 
@@ -42,7 +56,7 @@ public class ManageRecordsActivity extends Activity {
     /**
      * 创建保存录音文件的文件夹
      */
-    private void createSaveRecordsDir() {
+    private void createSaveRecordsDir(String path) {
         dir = new File(path);
         if (!dir.exists()) {
             dir.mkdirs();

@@ -28,7 +28,6 @@ public class RecorderService extends Service {
     }
 
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -43,7 +42,8 @@ public class RecorderService extends Service {
             mediaRecorder = new MediaRecorder();
             //2.指定录音机的声音源
             //此处的MediaRecorder.AudioSource.VOICE_CALL使用时注意，有些机型不可用，造成mediaRecorder.start()失败
-            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);//模拟器不可用
+//            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);//华为不可用
             //3.设置录制的文件输出的格式
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             //4.设置文件路径
@@ -55,21 +55,23 @@ public class RecorderService extends Service {
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
+                Toast.makeText(this, "录音文件创建失败", Toast.LENGTH_SHORT).show();
             }
 
             mediaRecorder.setOutputFile(path);
             //5.设置音频的编码
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            //6.准备开始录音
             try {
+                //6.准备开始录音
                 mediaRecorder.prepare();
-            } catch (IOException e) {
+                //7.开始录音
+                mediaRecorder.start();
+                Toast.makeText(this, "录音开始", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
                 e.printStackTrace();
+                Toast.makeText(this, "通话录音启动失败，请尝试修改声源或录音文件的保存路径", Toast.LENGTH_SHORT).show();
             }
-            //7.开始录音
-            mediaRecorder.start();
 
-            Toast.makeText(this, "录音开始", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -85,13 +87,17 @@ public class RecorderService extends Service {
             editor.putString("filename","");
             editor.commit();
 
-            //8.停止捕获
-            mediaRecorder.stop();
+            try {
+                //8.停止捕获
+                mediaRecorder.stop();
+                Toast.makeText(this, "录音已保存", Toast.LENGTH_SHORT).show();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "通话录音出错，请确认是否录制成功", Toast.LENGTH_SHORT).show();
+            }
             //9.释放资源
             mediaRecorder.release();
             mediaRecorder = null;
-
-            Toast.makeText(this, "录音已保存", Toast.LENGTH_SHORT).show();
         }
     }
 

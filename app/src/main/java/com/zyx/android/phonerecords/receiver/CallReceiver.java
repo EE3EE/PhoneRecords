@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
+import com.zyx.android.phonerecords.db.dao.ContactsNameDao;
 import com.zyx.android.phonerecords.service.RecorderService;
 
 import java.text.SimpleDateFormat;
@@ -36,7 +37,9 @@ public class CallReceiver extends BroadcastReceiver {
 
             SharedPreferences.Editor editor = sp.edit();
             editor.putBoolean("isCall", true);
-            String filename = getResultData() + "_1_"+ getCurrentTime();
+            String outComingName = ContactsNameDao.getContactNameByPhoneNumber(context,getResultData());
+            String filename = outComingName + "_1_"+ getCurrentTime();
+//            String filename = getResultData() + "_1_"+ getCurrentTime();
             editor.putString("filename", filename);
             editor.commit();
 
@@ -64,6 +67,7 @@ public class CallReceiver extends BroadcastReceiver {
                     stopRecorderService();
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK://接听时-开启录音
+                    //呼入的电话录音的开始时间正常，但是呼出电话的录音的开始时机就提前，此处看看能否优化
                     startRecorderService();
                     break;
                 case TelephonyManager.CALL_STATE_RINGING:
@@ -71,8 +75,10 @@ public class CallReceiver extends BroadcastReceiver {
 
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putBoolean("isCall",false);
-                    //此处的filename可以继续优化，比如将incomingname变为姓名
-                    String filename = incomingNumber +"_0_" +getCurrentTime() ;
+                    //此处的filename可以继续优化，比如将incomingNunmber变为姓名
+                    String incomingName = ContactsNameDao.getContactNameByPhoneNumber(context,incomingNumber);
+                    String filename = incomingName +"_0_" +getCurrentTime() ;
+//                    String filename = incomingNumber +"_0_" +getCurrentTime() ;
                     editor.putString("filename",filename);
                     editor.commit();
 
@@ -98,6 +104,7 @@ public class CallReceiver extends BroadcastReceiver {
      */
     private void startRecorderService() {
         Intent intent = new Intent(context,RecorderService.class);
+        intent.addFlags(intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         context.startService(intent);
     }
 
