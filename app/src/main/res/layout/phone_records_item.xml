@@ -4,16 +4,35 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tv_file_name"
+    <LinearLayout
+        android:id="@+id/ll_top"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="录音文件名称"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
-        />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_file_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="录音文件名称"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_file_totaltime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="文件时长"
+            android:textColor="#88000000"
+            android:textSize="12sp"
+            android:layout_toRightOf="@+id/tv_file_name"
+            android:layout_marginLeft="10dp"
+            />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_file_date"
@@ -24,7 +43,7 @@
         android:textSize="16sp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="3dp"
-        android:layout_below="@+id/tv_file_name"
+        android:layout_below="@+id/ll_top"
         />
 
     <TextView
@@ -36,8 +55,10 @@
         android:textSize="16sp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="3dp"
-        android:layout_below="@+id/tv_file_name"
+        android:layout_below="@+id/ll_top"
         android:layout_toRightOf="@+id/tv_file_date"
         />
+
+
 
 </RelativeLayout>

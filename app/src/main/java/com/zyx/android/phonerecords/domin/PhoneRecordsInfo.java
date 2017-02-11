@@ -12,6 +12,10 @@ public class PhoneRecordsInfo {
      * 录音类型，0为呼入，1为呼出
      */
     private int type;
+    /**
+     * 每个录音文件的时长
+     */
+    private double totaltime;
 
 
     public String getDate() {
@@ -38,5 +42,11 @@ public class PhoneRecordsInfo {
         this.type = type;
     }
 
+    public double getTotaltime() {
+        return totaltime;
+    }
 
+    public void setTotaltime(double totaltime) {
+        this.totaltime = totaltime;
+    }
 }
