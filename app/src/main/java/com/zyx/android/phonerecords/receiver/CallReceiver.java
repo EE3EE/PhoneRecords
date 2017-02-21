@@ -118,6 +118,7 @@ public class CallReceiver extends BroadcastReceiver {
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss",Locale.getDefault());
         return formatter.format(currentTime);
+
     }
 
 

@@ -8,6 +8,7 @@ public class PhoneRecordsInfo {
 
     private String name;
     private String date;
+    private String time;
     /**
      * 录音类型，0为呼入，1为呼出
      */
@@ -15,7 +16,11 @@ public class PhoneRecordsInfo {
     /**
      * 每个录音文件的时长
      */
-    private double totaltime;
+    private String totaltime;
+    /**
+     * 录音文件的路径，播放时调用
+     */
+    private String savePath;
 
 
     public String getDate() {
@@ -24,6 +29,14 @@ public class PhoneRecordsInfo {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getName() {
@@ -42,11 +55,19 @@ public class PhoneRecordsInfo {
         this.type = type;
     }
 
-    public double getTotaltime() {
+    public String getTotaltime() {
         return totaltime;
     }
 
-    public void setTotaltime(double totaltime) {
+    public void setTotaltime(String totaltime) {
         this.totaltime = totaltime;
+    }
+
+    public String getSavePath() {
+        return savePath;
+    }
+
+    public void setSavePath(String savePath) {
+        this.savePath = savePath;
     }
 }

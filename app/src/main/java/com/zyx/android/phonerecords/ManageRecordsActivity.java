@@ -1,82 +1,68 @@
 package com.zyx.android.phonerecords;
 
-import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.Button;
 
-import com.zyx.android.phonerecords.domin.PhoneRecordsInfo;
-import com.zyx.android.phonerecords.engine.PhoneRecordsInfoProvider;
+import com.zyx.android.phonerecords.fragment.IncomingFragment;
+import com.zyx.android.phonerecords.fragment.OutgoingFragment;
+import com.zyx.android.phonerecords.fragment.TodayFragment;
 
 import java.io.File;
-import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
  * 作为录音管理页面使用，暂未完成
  */
-public class ManageRecordsActivity extends Activity {
+public class ManageRecordsActivity extends FragmentActivity{
 
-    private ListView iv_phone_records;
+
+    @BindView(R.id.btn_today)
+    Button btnToday;
+    @BindView(R.id.btn_outgoing)
+    Button btnOutgoing;
+    @BindView(R.id.btn_incoming)
+    Button btnIncoming;
+
+    private FragmentManager fragmentManager = getSupportFragmentManager();
     private File dir;
-    List<PhoneRecordsInfo> infos;
-
-
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case 0:
-                    iv_phone_records.setAdapter(new MyAdapter());
-                    break;
-                case 1:
-                    Toast.makeText(ManageRecordsActivity.this, "没有录音文件！", Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
+    private SharedPreferences sp;
+    private Fragment outgoingFragment;
+    private Fragment todayFragment;
+    private Fragment incomingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_records);
+        ButterKnife.bind(this);
 
+
+        //获取并创建录音保存路径
         String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PhoneRecords/";
         createSaveRecordsDir(path);
 
-        iv_phone_records = (ListView) findViewById(R.id.iv_phone_records);
+        //将"录音保存路径"保存到配置文件
+        sp = getSharedPreferences("config", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("path", path);
+        editor.commit();
 
-        fillData();
-    }
+        //使用FragmentManager动态加载Fragment
+        todayFragment = new TodayFragment();
+        outgoingFragment = new OutgoingFragment();
+        incomingFragment = new IncomingFragment();
+        fragmentManager.beginTransaction().add(R.id.fl_content, incomingFragment).commit();
 
-
-    /**
-     * 获取所有录音文件的信息
-     */
-    private void fillData() {
-        new Thread(){
-            @Override
-            public void run() {
-                //获取所有的录音信息
-                File[] files = dir.listFiles();
-                if (!(files == null)) {
-                    infos = PhoneRecordsInfoProvider.getAllPhoneRecordsInfos(files);
-                    handler.sendEmptyMessage(0);
-                }else{
-                    handler.sendEmptyMessage(1);
-                }
-            }
-        }.start();
     }
 
 
@@ -92,64 +78,36 @@ public class ManageRecordsActivity extends Activity {
 
 
     /**
-     * ListView的适配器
+     * 此处注意调试
+     * @param view
      */
-    private class MyAdapter extends BaseAdapter{
-
-        @Override
-        public int getCount() {
-            return infos.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view;
-            ViewHolder holder;
-            if (convertView != null){
-                view = convertView;
-                holder = (ViewHolder) view.getTag();
-            }else{
-                holder = new ViewHolder();
-                view = View.inflate(ManageRecordsActivity.this,R.layout.phone_records_item,null);
-                holder.tv_file_name = (TextView) view.findViewById(R.id.tv_file_name);
-                holder.tv_file_date = (TextView) view.findViewById(R.id.tv_file_date);
-                holder.tv_file_type = (TextView) view.findViewById(R.id.tv_file_type);
-                holder.tv_file_totaltime = (TextView) view.findViewById(R.id.tv_file_totaltime);
-                view.setTag(holder);
-            }
-
-            holder.tv_file_name.setText(infos.get(position).getName());
-            holder.tv_file_date.setText(infos.get(position).getDate());
-
-            String type = (infos.get(position).getType() == 0) ? "呼入" : "呼出";
-            holder.tv_file_type.setText(type);
-
-            String totalTime = String.valueOf((int) infos.get(position).getTotaltime()/1000);
-            holder.tv_file_totaltime.setText(totalTime+"秒");
-
-            return view;
+    @OnClick({R.id.btn_today, R.id.btn_outgoing, R.id.btn_incoming})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_today:
+                fragmentManager.beginTransaction()
+//                        .hide(inComingFragment)
+//                        .hide(outGoingFragment)
+                        .replace(R.id.fl_content, todayFragment)
+                        .commit();
+                break;
+            case R.id.btn_outgoing:
+                fragmentManager.beginTransaction()
+//                        .hide(todayFragment)
+//                        .hide(inComingFragment)
+                        .replace(R.id.fl_content, outgoingFragment)
+                        .commit();
+                break;
+            case R.id.btn_incoming:
+                fragmentManager.beginTransaction()
+//                        .hide(todayFragment)
+//                        .hide(outGoingFragment)
+                        .replace(R.id.fl_content, incomingFragment)
+                        .commit();
+                break;
         }
     }
 
 
-    /**
-     * View容器
-     */
-    static class ViewHolder{
-        TextView tv_file_name;
-        TextView tv_file_date;
-        TextView tv_file_type;
-        TextView tv_file_totaltime;
-    }
 
 }

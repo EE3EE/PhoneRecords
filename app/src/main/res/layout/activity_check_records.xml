@@ -2,12 +2,51 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    >
 
-    <ListView
-        android:id="@+id/iv_phone_records"
+    <FrameLayout
+        android:id="@+id/fl_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent"/>
+
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" >
+
+        <Button
+            android:id="@+id/btn_today"
+            android:onClick="onClick"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#99bb33"
+            android:text="今日"
+            />
+
+        <Button
+            android:id="@+id/btn_outgoing"
+            android:onClick="onClick"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#006622"
+            android:text="呼出"
+            />
+
+        <Button
+            android:id="@+id/btn_incoming"
+            android:onClick="onClick"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#335588"
+            android:text="呼入"
+            />
+
+    </LinearLayout>
 
 </RelativeLayout>
