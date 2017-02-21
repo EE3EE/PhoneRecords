@@ -6,21 +6,22 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zyx.android.phonerecords.R;
+import com.zyx.android.phonerecords.Utils.RecyclerItemClickListener;
 import com.zyx.android.phonerecords.domin.PhoneRecordsInfo;
 import com.zyx.android.phonerecords.engine.PhoneRecordsInfoProvider;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 
 /**
  * Created by ZYX on 2017/2/20.
@@ -30,72 +31,41 @@ public class BaseFragment extends Fragment {
 
     private List<PhoneRecordsInfo> infos;
     private SharedPreferences sp;
+    private MediaPlayer mp;
 
     public static final int TODAY = 0;
     public static final int INCOMING = 1;
     public static final int OUTGOING = 2;
 
-    protected ListView listView;
-
-//    /**
-//     * 查看录音播放进度的回调接口
-//     */
-//    public interface SeekBarCallBack{
-//        /**
-//         * 当前进度的回调方法
-//         * @param progress
-//         */
-//        public void currentProgress(int progress);
-//
-//        /**
-//         * 总进度的方法
-//         * @param total
-//         */
-//        public void totalProgress(int total);
-//
-//    }
+    protected RecyclerView recyclerView;
 
 
     /**
-     * 播放录音
-     * @param savePath 录音的绝对路径
+     * 播放录音，此处注意优化
      */
-//    private void playRecords(String savePath,SeekBarCallBack back) {
     private void playRecords(String savePath) {
-        MediaPlayer mp = new MediaPlayer();
+        mp = new MediaPlayer();
+
+        if (mp.isPlaying()) {
+            mp.stop();
+        }
         try {
             mp.setDataSource(savePath);
-//            int total = mp.getDuration();
-//            back.totalProgress(total);
             mp.prepare();
             mp.start();
-//            long time = System.currentTimeMillis();
-
-            //此处可用Handler或Timer设置循环，while也行
-//            while ((System.currentTimeMillis()-time)<total) {
-//                back.currentProgress(mp.getCurrentPosition());
-//                SystemClock.sleep(500);
-//            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
-
-
     }
 
 
 
-
     /**
-     * 在BaseFragment中加载ListView对象
-     * @param listView
+     * 在BaseFragment中加载RecyclerView对象
+     * @param recyclerView
      */
-    protected void loadingListView(ListView listView){
-        this.listView = listView;
+    protected void loadingListView(RecyclerView recyclerView){
+        this.recyclerView = recyclerView;
     }
 
 
@@ -110,7 +80,30 @@ public class BaseFragment extends Fragment {
                     Toast.makeText(getContext(), "没有录音文件！", Toast.LENGTH_SHORT).show();
                     break;
                 case 1:
-                    listView.setAdapter(new MyAdapter());
+                    // 布局管理器设置显示方式：
+                    // LinearLayoutManager类似ListView;
+                    // GridLayoutManager类似GridView;
+                    // StaggeredGridLayoutManager类似瀑布流
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                    recyclerView.setAdapter(new MyAdapter());
+                    //添加点击事件
+                    recyclerView.addOnItemTouchListener(
+                            new RecyclerItemClickListener(getContext(),recyclerView,
+                                    new RecyclerItemClickListener.OnItemClickListener(){
+
+                                        @Override
+                                        public void onItemClick(View view, int position) {
+
+                                            Toast.makeText(getContext(), "播放" + infos.get(position).getSavePath(), Toast.LENGTH_SHORT).show();
+                                            // 此处需优化
+                                            playRecords(infos.get(position).getSavePath());
+                                        }
+
+                                        @Override
+                                        public void onItemLongClick(View view, int position) {
+
+                                        }
+                                    }));
                     break;
                 default:
                     break;
@@ -118,83 +111,78 @@ public class BaseFragment extends Fragment {
         }
     };
 
-    /**
-     * 设置ListView的每一项的点击事件
-     */
-    public void setOnItemClick() {
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "播放" + infos.get(position).getSavePath(), Toast.LENGTH_SHORT).show();
-
-                playRecords(infos.get(position).getSavePath());
-            }
-        });
-    }
-
 
 
     /**
-     * ListView的适配器
+     * RecycleView的适配器
      */
-    protected class MyAdapter extends BaseAdapter {
+    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
 
-        @Override
-        public int getCount() {
-            return infos.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view;
-            ViewHolder holder;
-            if (convertView != null){
-                view = convertView;
-                holder = (ViewHolder) view.getTag();
-            }else{
-                holder = new ViewHolder();
-                view = View.inflate(getContext(), R.layout.phone_records_item,null);
-                holder.tv_file_name = (TextView) view.findViewById(R.id.tv_file_name);
-                holder.tv_file_date = (TextView) view.findViewById(R.id.tv_file_date);
-                holder.tv_file_type = (TextView) view.findViewById(R.id.tv_file_type);
-                holder.tv_file_totaltime = (TextView) view.findViewById(R.id.tv_file_totaltime);
-                view.setTag(holder);
+        /**
+         * 自定义的ViewHolder
+         */
+        class MyViewHolder extends RecyclerView.ViewHolder{
+            TextView tv_file_name;
+            TextView tv_file_date;
+            TextView tv_file_type;
+            TextView tv_file_totaltime;
+            /**
+             * 通过构造方法，获得自定义的ViewHolder的对象
+             * @param view 在创建自定义的MyViewHolder对象时，传入View参数
+             */
+            public MyViewHolder(View view){
+                super(view);
+                tv_file_name = (TextView) view.findViewById(R.id.tv_file_name);
+                tv_file_date = (TextView) view.findViewById(R.id.tv_file_date);
+                tv_file_type = (TextView) view.findViewById(R.id.tv_file_type);
+                tv_file_totaltime = (TextView) view.findViewById(R.id.tv_file_totaltime);
             }
+
+        }
+
+        /**
+         * 返回自定义的ViewHolder的对象
+         * @param parent
+         * @param viewType
+         * @return
+         */
+        @Override
+        public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            //加载RecyclerView中每个View对应的布局文件，获得view
+            View view = View.inflate(getContext(), R.layout.phone_records_item,null);
+            //将view传入自定义的ViewHolder的构造方法，获得自定义的ViewHolder的对象
+            MyViewHolder holder = new MyViewHolder(view);
+            //返回自定义的ViewHolder的对象
+            return holder;
+        }
+
+        /**
+         * 对上一步获得的自定义的ViewHolder的对象进行赋值
+         * （对应ListView中的getView，但省事很多）
+         * @param holder
+         * @param position
+         */
+        @Override
+        public void onBindViewHolder(MyAdapter.MyViewHolder holder, int position) {
 
             holder.tv_file_name.setText(infos.get(position).getName());
             holder.tv_file_date.setText(infos.get(position).getDate() + " " + infos.get(position).getTime());
-
             String type = (infos.get(position).getType() == 0) ? "呼入" : "呼出";
             holder.tv_file_type.setText(type);
-
             String totalTime = infos.get(position).getTotaltime();
             holder.tv_file_totaltime.setText("通话时长 " + totalTime);
+        }
 
-            return view;
+        /**
+         * 对应ListView中的getCount方法
+         * @return
+         */
+        @Override
+        public int getItemCount() {
+            return infos.size();
         }
     }
 
-
-    /**
-     * View容器
-     */
-    static class ViewHolder{
-        TextView tv_file_name;
-        TextView tv_file_date;
-        TextView tv_file_type;
-        TextView tv_file_totaltime;
-    }
 
 
     /**

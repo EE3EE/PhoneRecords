@@ -4,10 +4,9 @@
     android:layout_height="match_parent"
     tools:context="com.zyx.android.phonerecords.fragment.IncomingFragment">
 
-    <ListView
-        android:id="@+id/lv_incoming_records"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_incoming_records"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-    />
+        android:layout_height="match_parent"/>
 
 </FrameLayout>
